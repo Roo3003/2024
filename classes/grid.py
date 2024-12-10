@@ -28,11 +28,17 @@ class Grid():
         '''
         self.grid[row][col] = new_val
     
-    def get_tile(self, row, col):
+    def get_tiles(self, val):
         '''
-        Returns tile at row/col
+        Returns a set of all (row,col) coords of the symbol given by val
         '''
-        return self.grid[row][col]
+        coords = set()
+
+        for row in range(self.num_rows):
+            for col in range(self.num_cols):
+                if self.grid[row][col] == val:
+                    coords.add((row,col))
+        return coords
 
     def count_tiles(self, val):
         '''
@@ -44,4 +50,54 @@ class Grid():
                 if self.grid[row][col] == val:
                     count += 1
         return count
+    
+    def get_relative(self, row, col, dir, step=1, wraparound=False):
+        '''
+        Gets the relative tile 'step' steps (default 1) in the direction dir from row,col
+        Setting wraparound=True allows to traverse from left->right boundaries and top->bottom, and vice versa
+        dir: 'left','right','up,'down','nw','ne','sw','se' - last four are diagonals (north west, etc)
+        step: int
+        wraparound: bool
+
+        output:
+        row, col, val - of tile at respective step. If step exceeds boundary and wraparound=False, then error code (-1,-1,'.') is returned
+        '''
+        row_shift = col_shift = 0
+
+        match dir:
+            case 'left':
+                col_shift -= step
+            case 'right':
+                col_shift += step
+            case 'up':
+                row_shift -= step
+            case 'down':
+                row_shift += step
+            case 'nw':
+                row_shift -= step
+                col_shift -= step
+            case 'ne':
+                row_shift -= step
+                col_shift += step                
+            case 'sw':
+                row_shift += step
+                col_shift -= step
+            case 'se':
+                row_shift += step
+                col_shift += step
+        
+        # Get new tile row/col
+        if wraparound:
+            new_row = (row + row_shift) % self.num_rows
+            new_col = (col + col_shift) % self.num_cols
+        else:
+            new_row = (row + row_shift)
+            new_col = (col + col_shift)            
+
+        # Check not exceeding boundary
+        if new_row < 0 or new_col < 0 or new_row >= self.num_rows or new_col >= self.num_cols:
+            return (-1,-1,'.')
+
+        return (new_row, new_col, self.grid[new_row][new_col])
+
 
