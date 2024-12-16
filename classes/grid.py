@@ -65,13 +65,13 @@ class Grid():
         row_shift = col_shift = 0
 
         match dir:
-            case 'left':
+            case 'left' | '<':
                 col_shift -= step
-            case 'right':
+            case 'right' | '>':
                 col_shift += step
-            case 'up':
+            case 'up' | '^':
                 row_shift -= step
-            case 'down':
+            case 'down' | 'v':
                 row_shift += step
             case 'nw':
                 row_shift -= step
